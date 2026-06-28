@@ -46,12 +46,45 @@ public class FixCommand implements CommandExecutor, TabCompleter {
                 if (unfixable.isEmpty()) {
                     sender.sendMessage("§a修正不可能なエラーは現在ありません");
                 } else {
+                    boolean consoleOutput = false;
                     int page = 1;
                     int itemsPerPage = 10;
-                    if (args.length >= 2) {
-                        try {
-                            page = Integer.parseInt(args[1]);
-                        } catch (NumberFormatException ignored) {}
+                    
+                    for (int i = 1; i < args.length; i++) {
+                        if (args[i].equalsIgnoreCase("--console") || args[i].equalsIgnoreCase("-c")) {
+                            consoleOutput = true;
+                        } else {
+                            try {
+                                page = Integer.parseInt(args[i]);
+                            } catch (NumberFormatException ignored) {}
+                        }
+                    }
+
+                    if (consoleOutput) {
+                        plugin.getLogger().info("=== 未解決のエラー (" + unfixable.size() + "件) ===");
+                        for (ParsedError err : unfixable) {
+                            String formatted;
+                            switch (err.getType()) {
+                                case MATERIAL:
+                                    formatted = "アイテムIDが不正: " + err.getDetail();
+                                    break;
+                                case METASKILL:
+                                    formatted = "存在しないスキル: " + err.getDetail();
+                                    break;
+                                case TYPE_MISSING:
+                                    formatted = "Mobのタイプが不正: " + err.getDetail();
+                                    break;
+                                case TEXTURE:
+                                    formatted = "スキンテクスチャが不正";
+                                    break;
+                                default:
+                                    formatted = "その他: " + err.getDetail();
+                                    break;
+                            }
+                            plugin.getLogger().info(formatted + " (ファイル: " + err.getFile() + ")");
+                        }
+                        sender.sendMessage("§aコンソールに " + unfixable.size() + " 件のエラーリストを出力しました。");
+                        break;
                     }
                     
                     int totalPages = (int) Math.ceil((double) unfixable.size() / itemsPerPage);
@@ -175,6 +208,8 @@ public class FixCommand implements CommandExecutor, TabCompleter {
             List<String> options = new ArrayList<>(fixNames);
             options.add("auto_fix_on_reload");
             return StringUtil.copyPartialMatches(args[1], options, new ArrayList<>());
+        } else if (args.length == 2 && args[0].equalsIgnoreCase("list")) {
+            return StringUtil.copyPartialMatches(args[1], Arrays.asList("--console", "-c"), new ArrayList<>());
         }
         return Collections.emptyList();
     }

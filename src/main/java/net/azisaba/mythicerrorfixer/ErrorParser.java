@@ -132,7 +132,9 @@ public class ErrorParser {
             if (line.contains("Invalid SkinTexture provided") ||
                 (line.contains("not found") && line.contains("Material type")) ||
                 line.contains("Could not find MetaSkill") ||
-                line.contains("No Type specified.")) {
+                line.contains("No Type specified.") ||
+                line.contains("✗ Config Error") ||
+                line.contains("✗ Configuration Error")) {
                 
                 ParsedError.ErrorType type = ParsedError.ErrorType.OTHER;
                 String detail = line;
@@ -153,6 +155,12 @@ public class ErrorParser {
                     detail = detail.substring(0, fileMatcher.start()).trim();
                 }
                 
+                Matcher inMatcher = Pattern.compile(" in '(.*?)':").matcher(detail);
+                if (inMatcher.find()) {
+                    extractedFile = inMatcher.group(1).trim();
+                    detail = detail.replace(inMatcher.group(0), ":");
+                }
+
                 if (detail.contains("Material type")) {
                     type = ParsedError.ErrorType.MATERIAL;
                     Matcher mm = Pattern.compile("Material type '(.*?)'").matcher(detail);
@@ -161,13 +169,31 @@ public class ErrorParser {
                     type = ParsedError.ErrorType.METASKILL;
                     Matcher mm = Pattern.compile("Could not find MetaSkill (.*)").matcher(detail);
                     if (mm.find()) detail = mm.group(1).trim();
-                } else if (detail.contains("No Type specified")) {
+                } else if (detail.contains("No Type specified") || detail.contains("must be a valid MythicMob")) {
                     type = ParsedError.ErrorType.TYPE_MISSING;
                     Matcher mm = Pattern.compile("Could not load MythicMob (.*?)!").matcher(detail);
-                    if (mm.find()) detail = mm.group(1);
+                    if (mm.find()) {
+                        detail = mm.group(1);
+                    } else {
+                        // Extract type from summon mechanic if possible
+                        Matcher m2 = Pattern.compile("summon\\{.*?(?:t|type|m|mob)=(.*?)[;\\}]").matcher(detail);
+                        if (m2.find()) {
+                            detail = m2.group(1);
+                        } else {
+                            detail = "Unknown Type";
+                        }
+                    }
                 } else if (detail.contains("Invalid SkinTexture")) {
                     type = ParsedError.ErrorType.TEXTURE;
                     detail = "Texture parsing failed";
+                }
+
+                if (type == ParsedError.ErrorType.OTHER) {
+                    if (detail.startsWith("✗ Config Error for ")) {
+                        detail = detail.substring(19);
+                    } else if (detail.startsWith("✗ Configuration Error ")) {
+                        detail = detail.substring(22);
+                    }
                 }
 
                 unfixableErrors.add(new ParsedError(type, detail, extractedFile != null ? extractedFile : "Unknown"));
