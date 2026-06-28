@@ -1,0 +1,17 @@
+# MythicErrorFixer Configuration
+
+# Automatically fix errors and reload when MythicMobs reloads (on Server Start or /mm reload)
+auto_fix_on_reload: true
+
+# Which fixes should be applied?
+fixes:
+  # Fixes 'while scanning an anchor' by adding quotes around values starting with &
+  anchor_quotes: true
+  # Fixes 'A delay is incorrectly configured' by setting it to '- delay 1'
+  mechanic_delay: true
+  # Fixes 'The message attribute is required' by converting to message{m="..."}
+  mechanic_message: true
+  # Fixes 'Unbalanced Braces' by adding '}'
+  unbalanced_braces: true
+  # Replaces 'HIDE_POTION_EFFECTS' with 'HIDE_ADDITIONAL_TOOLTIP' across all files
+  itemflag_potion: true
