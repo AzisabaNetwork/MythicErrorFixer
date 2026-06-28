@@ -1,7 +1,7 @@
 name: MythicErrorFixer
 version: 1.0.0
 main: net.azisaba.mythicerrorfixer.MythicErrorFixer
-api-version: '1.21'
+api-version: '1.15'
 depend: [MythicMobs]
 description: Fixes MythicMobs errors automatically.
 authors: [Azisaba Network]

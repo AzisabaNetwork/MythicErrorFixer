@@ -1,6 +1,6 @@
 package net.azisaba.mythicerrorfixer;
 
-import io.lumine.mythic.bukkit.events.MythicReloadedEvent;
+import io.lumine.xikage.mythicmobs.api.bukkit.events.MythicReloadedEvent;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 

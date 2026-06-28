@@ -159,12 +159,12 @@ public class FileFixer {
                         
                         if (value != null && !value.trim().isEmpty()) {
                             try {
-                                java.util.Optional<com.cryptomorin.xseries.XMaterial> xMat = com.cryptomorin.xseries.XMaterial.matchXMaterial(value);
-                                if (xMat.isPresent()) {
-                                    org.bukkit.Material mat = xMat.get().parseMaterial();
-                                    if (mat != null) {
-                                        line = indent + key + ": " + mat.name();
-                                    }
+                                org.bukkit.Material mat = org.bukkit.Material.matchMaterial(value);
+                                if (mat == null) {
+                                    mat = org.bukkit.Material.matchMaterial(value, true);
+                                }
+                                if (mat != null) {
+                                    line = indent + key + ": " + mat.name();
                                 }
                             } catch (Exception ignored) {
                             }

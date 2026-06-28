@@ -15,7 +15,7 @@ public class LogCatcher extends AbstractAppender {
     private boolean capturing = false;
 
     public LogCatcher() {
-        super("MythicErrorFixer-LogCatcher", null, null, false, null);
+        super("MythicErrorFixer-LogCatcher", null, null, false);
     }
 
     public void attach() {
